@@ -1,4 +1,4 @@
-package com.example;
+package com.enchantedsymbolprotector;
 
 import com.google.inject.Provides;
 import javax.inject.Inject;
@@ -16,25 +16,13 @@ import net.runelite.client.plugins.PluginDescriptor;
 @PluginDescriptor(
 	name = "Example"
 )
-public class ExamplePlugin extends Plugin
+public class EnchantedSymbolProtectorPlugin extends Plugin
 {
 	@Inject
 	private Client client;
 
 	@Inject
-	private ExampleConfig config;
-
-	@Override
-	protected void startUp() throws Exception
-	{
-		log.debug("Example started!");
-	}
-
-	@Override
-	protected void shutDown() throws Exception
-	{
-		log.debug("Example stopped!");
-	}
+	private EnchantedSymbolProtectorConfig config;
 
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged gameStateChanged)
@@ -46,8 +34,8 @@ public class ExamplePlugin extends Plugin
 	}
 
 	@Provides
-	ExampleConfig provideConfig(ConfigManager configManager)
+	EnchantedSymbolProtectorConfig provideConfig(ConfigManager configManager)
 	{
-		return configManager.getConfig(ExampleConfig.class);
+		return configManager.getConfig(EnchantedSymbolProtectorConfig.class);
 	}
 }

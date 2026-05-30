@@ -1,13 +1,14 @@
 package com.example;
 
+import com.enchantedsymbolprotector.EnchantedSymbolProtectorPlugin;
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 
-public class ExamplePluginTest
+public class EnchantedSymbolProtectorTest
 {
 	public static void main(String[] args) throws Exception
 	{
-		ExternalPluginManager.loadBuiltin(ExamplePlugin.class);
+		ExternalPluginManager.loadBuiltin(EnchantedSymbolProtectorPlugin.class);
 		RuneLite.main(args);
 	}
 }
