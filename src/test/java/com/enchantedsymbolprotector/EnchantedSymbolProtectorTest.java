@@ -1,6 +1,5 @@
-package com.example;
+package com.enchantedsymbolprotector;
 
-import com.enchantedsymbolprotector.EnchantedSymbolProtectorPlugin;
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 
