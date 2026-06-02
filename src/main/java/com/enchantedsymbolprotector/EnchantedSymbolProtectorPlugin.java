@@ -6,6 +6,7 @@ import net.runelite.api.*;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
+import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -26,22 +27,28 @@ public class EnchantedSymbolProtectorPlugin extends Plugin
 	 */
 	@Subscribe void onMenuOptionClicked(MenuOptionClicked event)
 	{
-		log.debug("1");
 		if(event.getItemId() != ItemID.MA2_SYMBOL) return;
-		log.debug("2");
 		if(!event.getMenuOption().equals("Activate")) return;
-		//check if too many items are present
-		int item_limit = 3;
-		if(client.isPrayerActive(Prayer.PROTECT_ITEM)) item_limit++;
-		ItemContainer inventory = client.getItemContainer(InventoryID.INV);
-		log.debug("3");
-		if(inventory == null) return;
-		ItemContainer worn = client.getItemContainer(InventoryID.WORN);
-		log.debug("4");
-		int worn_count = (worn == null) ? 0 : worn.count();
-		log.debug("5");
-		if(inventory.count() + worn_count <= item_limit) return;
-		log.debug("6");
-		event.consume();
+		int item_limit = (client.isPrayerActive(Prayer.PROTECT_ITEM)) ? 4 : 3;
+		int quiver_ammo = client.getVarpValue(VarPlayerID.DIZANAS_QUIVER_TEMP_AMMO_AMOUNT);
+		if(tallyItems(InventoryID.INV) + tallyItems(InventoryID.WORN) + quiver_ammo > item_limit) event.consume();
+	}
+
+	/**
+	 * Counts items including quantities in container
+	 *
+	 * @param id InventoryID of the container
+	 * @return total quantity
+	 */
+	private int tallyItems(int id)
+	{
+		ItemContainer items = client.getItemContainer(id);
+		if(items == null) return 0;
+		int total = 0;
+		for(Item item : items.getItems())
+		{
+			total += item.getQuantity();
+		}
+		return total;
 	}
 }
