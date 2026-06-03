@@ -7,6 +7,9 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarPlayerID;
+import net.runelite.client.Notifier;
+import net.runelite.client.chat.ChatMessageManager;
+import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -20,6 +23,8 @@ public class EnchantedSymbolProtectorPlugin extends Plugin
 	@Inject
 	private Client client;
 
+	private final ChatMessageManager chatMessageManager = null;
+
 	/**
 	 * Disables unsafe clicks on Enchanted Symbol
 	 *
@@ -31,7 +36,11 @@ public class EnchantedSymbolProtectorPlugin extends Plugin
 		if(!event.getMenuOption().equals("Activate")) return;
 		int item_limit = (client.isPrayerActive(Prayer.PROTECT_ITEM)) ? 4 : 3;
 		int quiver_ammo = client.getVarpValue(VarPlayerID.DIZANAS_QUIVER_TEMP_AMMO_AMOUNT);
-		if(tallyItems(InventoryID.INV) + tallyItems(InventoryID.WORN) + quiver_ammo > item_limit) event.consume();
+		if(tallyItems(InventoryID.INV) + tallyItems(InventoryID.WORN) + quiver_ammo > item_limit)
+		{
+			displayWarning();
+			event.consume();
+		}
 	}
 
 	/**
@@ -50,5 +59,13 @@ public class EnchantedSymbolProtectorPlugin extends Plugin
 			total += item.getQuantity();
 		}
 		return total;
+	}
+
+	/**
+	 * Shows symbol activation was canceled
+	 */
+	private void displayWarning()
+	{
+		chatMessageManager.queue(QueuedMessage.builder().type(ChatMessageType.CONSOLE).runeLiteFormattedMessage("Too many items!").build());
 	}
 }
