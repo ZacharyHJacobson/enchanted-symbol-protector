@@ -1,6 +1,8 @@
 package com.enchantedsymbolprotector;
 
 import javax.inject.Inject;
+
+import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.MenuOptionClicked;
@@ -9,6 +11,7 @@ import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -38,6 +41,9 @@ public class EnchantedSymbolProtectorPlugin extends Plugin
 	@Inject
 	private Client client;
 
+	@Inject
+	private EnchantedSymbolProtectorConfig config;
+
 	private final ChatMessageManager chatMessageManager = null;
 
 	/**
@@ -55,9 +61,10 @@ public class EnchantedSymbolProtectorPlugin extends Plugin
 		{
 			quiver_ammo = client.getVarpValue(VarPlayerID.DIZANAS_QUIVER_TEMP_AMMO_AMOUNT);
 		}
-		if(tallyItems(InventoryID.INV) + tallyItems(InventoryID.WORN) + quiver_ammo > item_limit)
+		int total_items = tallyItems(InventoryID.INV) + tallyItems(InventoryID.WORN) + quiver_ammo;
+		if(total_items > item_limit)
 		{
-			displayWarning();
+			if(config.displayWarning()) displayWarning(total_items);
 			event.consume();
 		}
 	}
@@ -100,8 +107,14 @@ public class EnchantedSymbolProtectorPlugin extends Plugin
 	/**
 	 * Shows symbol activation was canceled
 	 */
-	private void displayWarning()
+	private void displayWarning(int total_items)
 	{
-		chatMessageManager.queue(QueuedMessage.builder().type(ChatMessageType.CONSOLE).runeLiteFormattedMessage("Too many items!").build());
+		chatMessageManager.queue(QueuedMessage.builder().type(ChatMessageType.CONSOLE).runeLiteFormattedMessage(total_items + " present, symbol disabled.").build());
+	}
+
+	@Provides
+	EnchantedSymbolProtectorConfig provideConfig(ConfigManager configManager)
+	{
+		return configManager.getConfig(EnchantedSymbolProtectorConfig.class);
 	}
 }
