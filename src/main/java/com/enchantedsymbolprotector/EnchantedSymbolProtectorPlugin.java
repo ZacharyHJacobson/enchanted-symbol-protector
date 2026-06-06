@@ -7,12 +7,13 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarPlayerID;
-import net.runelite.client.Notifier;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+
+import java.util.Set;
 
 @Slf4j
 @PluginDescriptor(
@@ -20,6 +21,20 @@ import net.runelite.client.plugins.PluginDescriptor;
 )
 public class EnchantedSymbolProtectorPlugin extends Plugin
 {
+	private static final Set<Integer> QUIVER_IDS = Set.of(
+			ItemID.DIZANAS_QUIVER_UNCHARGED,
+			ItemID.DIZANAS_QUIVER_BROKEN,
+			ItemID.DIZANAS_QUIVER_UNCHARGED_TROUVER,
+			ItemID.DIZANAS_QUIVER_CHARGED,
+			ItemID.DIZANAS_QUIVER_CHARGED_TROUVER,
+			ItemID.DIZANAS_QUIVER_INFINITE,
+			ItemID.DIZANAS_QUIVER_INFINITE_BROKEN,
+			ItemID.DIZANAS_QUIVER_INFINITE_TROUVER,
+			ItemID.SKILLCAPE_MAX_DIZANAS,
+			ItemID.SKILLCAPE_MAX_DIZANAS_BROKEN,
+			ItemID.SKILLCAPE_MAX_DIZANAS_TROUVER
+	);
+
 	@Inject
 	private Client client;
 
@@ -35,12 +50,33 @@ public class EnchantedSymbolProtectorPlugin extends Plugin
 		if(event.getItemId() != ItemID.MA2_SYMBOL) return;
 		if(!event.getMenuOption().equals("Activate")) return;
 		int item_limit = (client.isPrayerActive(Prayer.PROTECT_ITEM)) ? 4 : 3;
-		int quiver_ammo = client.getVarpValue(VarPlayerID.DIZANAS_QUIVER_TEMP_AMMO_AMOUNT);
+		int quiver_ammo = 0;
+		if(hasQuiver(InventoryID.INV) || hasQuiver(InventoryID.WORN))
+		{
+			quiver_ammo = client.getVarpValue(VarPlayerID.DIZANAS_QUIVER_TEMP_AMMO_AMOUNT);
+		}
 		if(tallyItems(InventoryID.INV) + tallyItems(InventoryID.WORN) + quiver_ammo > item_limit)
 		{
 			displayWarning();
 			event.consume();
 		}
+	}
+
+	/**
+	 * Checks if container includes a Dizana's Quiver
+	 *
+	 * @param id InventoryID of the container
+	 * @return if quiver is present
+	 */
+	private boolean hasQuiver(int id)
+	{
+		ItemContainer items = client.getItemContainer(id);
+		if(items == null) return false;
+		for(Item item : items.getItems())
+		{
+			if(QUIVER_IDS.contains(item.getId())) return true;
+		}
+		return false;
 	}
 
 	/**
