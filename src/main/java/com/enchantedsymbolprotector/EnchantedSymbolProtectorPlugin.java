@@ -44,7 +44,7 @@ public class EnchantedSymbolProtectorPlugin extends Plugin
 	@Inject
 	private EnchantedSymbolProtectorConfig config;
 
-	private final ChatMessageManager chatMessageManager = null;
+	@Inject private ChatMessageManager chatMessageManager;
 
 	/**
 	 * Disables unsafe clicks on Enchanted Symbol
@@ -109,7 +109,7 @@ public class EnchantedSymbolProtectorPlugin extends Plugin
 	 */
 	private void displayWarning(int total_items)
 	{
-		chatMessageManager.queue(QueuedMessage.builder().type(ChatMessageType.CONSOLE).runeLiteFormattedMessage(total_items + " present, symbol disabled.").build());
+		chatMessageManager.queue(QueuedMessage.builder().type(ChatMessageType.CONSOLE).runeLiteFormattedMessage(total_items + " items present, symbol disabled.").build());
 	}
 
 	@Provides
