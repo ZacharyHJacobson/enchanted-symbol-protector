@@ -9,6 +9,17 @@ public interface EnchantedSymbolProtectorConfig extends Config
 {
 	String GROUP = "enchantedsymbolprotector";
 	@ConfigItem(
+			position = 1,
+			keyName = "disableOnRedemption",
+			name = "Disable during Redemption",
+			description = "Disable the Symbol while Redemption or Vindication is active."
+	)
+	default boolean disableOnRedemption()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		position = 0,
 		keyName = "displayWarning",
 		name = "Display Warning",

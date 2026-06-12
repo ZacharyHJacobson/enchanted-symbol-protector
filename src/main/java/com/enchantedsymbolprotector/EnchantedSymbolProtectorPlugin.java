@@ -55,6 +55,14 @@ public class EnchantedSymbolProtectorPlugin extends Plugin
 	{
 		if(event.getItemId() != ItemID.MA2_SYMBOL) return;
 		if(!event.getMenuOption().equals("Activate")) return;
+		if(client.isPrayerActive(Prayer.REDEMPTION) || client.isPrayerActive(Prayer.RP_VINDICATION))
+		{
+			if(config.disableOnRedemption())
+			{
+				cancelClick(event, "Redemption enabled, symbol disabled.");
+				return;
+			}
+		}
 		int item_limit = (client.isPrayerActive(Prayer.PROTECT_ITEM)) ? 4 : 3;
 		int quiver_ammo = 0;
 		if(hasQuiver(InventoryID.INV) || hasQuiver(InventoryID.WORN))
@@ -64,8 +72,7 @@ public class EnchantedSymbolProtectorPlugin extends Plugin
 		int total_items = tallyItems(InventoryID.INV) + tallyItems(InventoryID.WORN) + quiver_ammo;
 		if(total_items > item_limit)
 		{
-			if(config.displayWarning()) displayWarning(total_items);
-			event.consume();
+			cancelClick(event, total_items + " items present, symbol disabled.");
 		}
 	}
 
@@ -105,11 +112,17 @@ public class EnchantedSymbolProtectorPlugin extends Plugin
 	}
 
 	/**
-	 * Shows symbol activation was canceled
+	 * Displays warning if enabled and consumes the event
+	 * @param event click event
+	 * @param warning warning text if enabled
 	 */
-	private void displayWarning(int total_items)
+	private void cancelClick(MenuOptionClicked event, String warning)
 	{
-		chatMessageManager.queue(QueuedMessage.builder().type(ChatMessageType.CONSOLE).runeLiteFormattedMessage(total_items + " items present, symbol disabled.").build());
+		if(config.displayWarning())
+		{
+			chatMessageManager.queue(QueuedMessage.builder().type(ChatMessageType.CONSOLE).runeLiteFormattedMessage(warning).build());
+		}
+		event.consume();
 	}
 
 	@Provides
